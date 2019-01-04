@@ -13,12 +13,10 @@ Show any code that is needed to:
 
 1. Process/transform the data (if necessary) into a format suitable for your analysis  
 
-```{r, include= F, echo=T, results='hide'}
-library(dplyr)
-library(ggplot2)
-```
 
-```{r}
+
+
+```r
 pamd <- read.csv("activity.csv")
 pamd$date <- as.Date(pamd$date)
 ```
@@ -33,7 +31,8 @@ For this part of the assignment, you can ignore the missing values in the datase
 
 1. Calculate and report the mean and median of the total number of steps taken per day
 
-```{r stepsperday}
+
+```r
 pamd_bydate <- pamd %>% 
     group_by(date) %>% 
     summarise(steps_day = sum(steps))
@@ -50,7 +49,9 @@ hist(pamd_bydate$steps_day,
 abline(v=pamd_mean, lty=2, lwd=2)
 ```
 
-_The histogram above shows the distribution of steps taken per day with a mean of **`r format(pamd_mean, digits=7)`**. The median of the data is **`r format(pamd_median, digits=7)`**._
+![plot of chunk stepsperday](figure/stepsperday-1.png)
+
+_The histogram above shows the distribution of steps taken per day with a mean of **10766.19**. The median of the data is **10765**._
 
 
 ####What is the average daily activity pattern?
@@ -58,7 +59,8 @@ _The histogram above shows the distribution of steps taken per day with a mean o
 
 1. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
-```{r stepsperinterval}
+
+```r
 pamd_byinterval <- na.omit(pamd) %>% 
     group_by(interval) %>% 
     summarise(steps_interval = mean(steps))
@@ -74,12 +76,16 @@ plot(pamd_byinterval,
 
 axis(1, at = seq(from = 0, to = max(pamd_byinterval$interval), by = 100),
      las = 2, cex.axis = .9)
+```
 
+![plot of chunk stepsperinterval](figure/stepsperinterval-1.png)
+
+```r
 pamd_max <- filter(pamd_byinterval, 
        pamd_byinterval$steps_interval == max(pamd_byinterval$steps_interval))
 ```
 
-_The above chart shows the mean number of steps taken for each 5-minute interval in a day. The test subject took the highest number of steps on average at **`r pamd_max[1,1]`** with an average of **`r as.integer(pamd_max[1,2])` steps**._
+_The above chart shows the mean number of steps taken for each 5-minute interval in a day. The test subject took the highest number of steps on average at **835** with an average of **206 steps**._
 
 
 ####Imputing missing values
@@ -94,7 +100,8 @@ Note that there are a number of days/intervals where there are missing values (c
 
 1. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
-```{r missingvalues}
+
+```r
 missing <- sum(is.na(pamd$steps))
 
 pamd_new <- pamd %>% 
@@ -117,7 +124,9 @@ hist(pamd_bydate_new$steps_day,
 abline(v=pamd_new_mean, lty=2, lwd=2)
 ```
 
-_The number of observations with NA values is **`r missing`**. Replacing these values with the mean of their 5-minute intervals has **no effect** on the overall mean and median of the dataset. The mean remains **`r format(pamd_new_mean, digits=7)`** and the medain remains **`r format(pamd_new_median, digits=7)`**._
+![plot of chunk missingvalues](figure/missingvalues-1.png)
+
+_The number of observations with NA values is **2304**. Replacing these values with the mean of their 5-minute intervals has **no effect** on the overall mean and median of the dataset. The mean remains **10766.19** and the medain remains **10765**._
 
 
 ####Are there differences in activity patterns between weekdays and weekends?
@@ -126,7 +135,8 @@ _The number of observations with NA values is **`r missing`**. Replacing these v
 
 1. Make a panel plot containing a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
 
-```{r weekdays}
+
+```r
 pamd_new <- pamd %>% 
     group_by(interval) %>% 
     mutate(steps_new = ifelse(is.na(steps), mean(steps, na.rm = T), steps))
@@ -148,6 +158,8 @@ ggplot(pamd_new_byinterval, aes(x = interval, y = steps_interval)) +
     ggtitle("Steps Taken per 5-Minute Interval by Weekday/Weekend") +
     theme(plot.title = element_text(hjust = .5))
 ```
+
+![plot of chunk weekdays](figure/weekdays-1.png)
 
 _The above chart shows the mean steps taken per 5-minute interval, comparing weekdays to weekends. The charts show that the individual generally took more steps in the middle of the day (from 1000 to 1700) on the weekend than he/she did on weekdays. Both weekdays and weekends showed a peak activity in the morning around 830._
 
